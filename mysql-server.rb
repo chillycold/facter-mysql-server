@@ -1,14 +1,15 @@
 # mysql-server.rb
 
-Facter.add("mysql-server") do
-  setcode do
-  os = Facter.value('operatingsystem')
+os = Facter.value('operatingsystem')
   case os
       when "RedHat", "CentOS", "SuSE", "Fedora"
-        is_installed = system 'rpm -q mysql-server'
-      when "Debian", "Ubuntu"
-        is_installed = system 'dpkg -s git | grep Version'
-      else
-   end
-  end
+        result = %x{/bin/rpm -qa --queryformat "%{VERSION}-%{RELEASE}" mysql-server}
+when "Debian", "Ubuntu"
+        result = %x{dpkg -s git | grep Version}
+end
+
+Facter.add('mysql-server') do
+    setcode do
+        result
+    end
 end
